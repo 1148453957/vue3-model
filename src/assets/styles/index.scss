@@ -1,0 +1,31 @@
+@import "./default.scss";
+@import "./another.scss";
+
+
+$themes: (default: $theme-default,another: $theme-another,);
+$theme-map: null;
+@mixin themes() {
+  // 本质上，就只是map-get($theme-old, 'background-color1')就可以获取对应的属性
+  // 利用[data-theme="#{$theme-name}"]把多个theme抽取出对应的theme，其实也可以利用js来获取对应的theme
+  @each $theme-name,
+  $map in $themes {
+    // & 表示父级元素  !global 表示覆盖原来的
+    [data-theme="#{$theme-name}"] & {
+      /* TODO:先清空赋值，再循环合并，似乎性能上更好？待以后css样式多了再测试吧
+      $theme-map: () !global;
+      // 循环合并键值对
+      @each $key,
+      $value in $map {
+        $theme-map: map-merge($theme-map,
+            ($key: $value,
+            )) !global;
+      } */
+      $theme-map: $map !global;
+      @content;
+    }
+  }
+}
+
+@function theme($key) {
+  @return map-get($theme-map, $key);
+}
